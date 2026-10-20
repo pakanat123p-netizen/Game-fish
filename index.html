@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#4fc3f7">
+  <title>เกมต่อปลา — ห้องเรียนใต้ทะเล</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Mali:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #193b36;
+      --muted: #69817a;
+      --paper: #f8f8ee;
+      --sea: #dceee4;
+      --line: #c8d9ce;
+      --coral: #ed7658;
+      --sun: #f3c35c;
+      --teal: #4a9b8a;
+      --shadow: 0 14px 34px #1e473015;
+      font-family: "Leelawadee UI", "Tahoma", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--ink);
+      background-color: var(--sea);
+      background-image: radial-gradient(#ffffffa8 1px, transparent 1px), linear-gradient(145deg, #e8f3dd 0%, #d8eee7 54%, #f3efce 100%);
+      background-size: 19px 19px, auto;
+    }
+    button { color: inherit; font: inherit; }
+    .topbar {
+      min-height: 64px;
+      padding: 0 clamp(18px, 4vw, 58px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #73988b33;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 900; letter-spacing: .02em; }
+    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; background: var(--coral); color: white; border-radius: 50% 50% 42% 50%; transform: rotate(-8deg); }
+    .top-note { color: var(--muted); font-size: 13px; }
+    main { width: min(1420px, 100%); margin: auto; padding: 25px clamp(16px, 3.4vw, 48px) 38px; }
+    .intro { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin: 3px 0 22px; }
+    .eyebrow { margin: 0 0 7px; color: #468576; text-transform: uppercase; font-weight: 800; font-size: 11px; letter-spacing: .12em; }
+    h1 { margin: 0; font-family: Georgia, "Leelawadee UI", serif; font-size: clamp(29px, 3.5vw, 43px); line-height: 1.12; letter-spacing: 0; }
+    .intro-copy { max-width: 330px; margin: 0 2px 3px 0; color: #526f66; line-height: 1.65; font-size: 14px; }
+    .layout { display: grid; grid-template-columns: 225px minmax(390px, 1fr) 270px; gap: 16px; align-items: stretch; }
+    .panel { background: #fcfcf4ed; border: 1px solid #ffffff; border-radius: 7px; box-shadow: var(--shadow); }
+    .species-panel { padding: 18px 14px; }
+    .section-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 13px; }
+    .section-head h2, .panel-title { margin: 0; font-size: 15px; font-weight: 900; }
+    .mini-count { color: var(--muted); font-size: 11px; }
+    .species-list { display: grid; gap: 8px; }
+    .species-button {
+      width: 100%; padding: 10px; border: 1px solid transparent; border-radius: 5px; background: transparent;
+      display: flex; align-items: center; gap: 10px; text-align: left; cursor: pointer; transition: background .18s, border .18s, transform .18s;
+    }
+    .species-button:hover { background: #eef4e8; }
+    .species-button[aria-pressed="true"] { background: #e6f2e8; border-color: #aacdb7; }
+    .fish-stamp { flex: 0 0 42px; width: 42px; height: 42px; overflow: hidden; border-radius: 50%; background: #dcece3; }
+    .fish-thumb { width: 100%; height: 100%; display: block; object-fit: cover; }
+    .species-name { display: block; font-size: 13px; font-weight: 850; }
+    .species-common-en { display: block; margin-top: 2px; color: #55756a; font-size: 10px; }
+    .species-latin { display: block; margin-top: 3px; color: var(--muted); font: italic 10px Georgia, serif; }
+    .classification { margin-top: 18px; padding-top: 15px; border-top: 1px solid #d9e4da; }
+    .class-label { color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .06em; }
+    .class-name { margin: 5px 0 4px; font-size: 16px; font-weight: 900; }
+    .class-path { color: #5d776e; font-size: 11px; line-height: 1.7; }
+    .play-panel { min-width: 0; overflow: hidden; }
+    .play-head { padding: 15px 18px 11px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px 12px; }
+    .play-title { margin: 0; font-size: 15px; font-weight: 900; }
+    .view-switch { display: inline-flex; padding: 3px; gap: 2px; border: 1px solid #c8d9ce; border-radius: 5px; background: #edf2e8; }
+    .view-button { padding: 6px 9px; border: 0; border-radius: 3px; background: transparent; color: #5c746a; font-size: 10px; font-weight: 800; cursor: pointer; }
+    .view-button[aria-pressed="true"] { background: #fffef7; color: #244d42; box-shadow: 0 1px 3px #193b361c; }
+    .progress-wrap { display: flex; align-items: center; gap: 9px; }
+    .progress-text { color: var(--muted); font-size: 11px; white-space: nowrap; }
+    .progress-track { width: 78px; height: 6px; border-radius: 99px; overflow: hidden; background: #e2e8dc; }
+    .progress-fill { height: 100%; width: 0; border-radius: inherit; background: var(--coral); transition: width .3s; }
+    .fish-stage {
+      position: relative; isolation: isolate; margin: 0 12px; aspect-ratio: 3 / 2; overflow: hidden; border-radius: 5px;
+      background-color: #087da5;
+      background-image: repeating-linear-gradient(108deg, transparent 0 46px, #b7f3ff20 48px 54px, transparent 56px 92px), linear-gradient(180deg, #74d9ef 0%, #168db8 64%, #125b79 100%);
+    }
+    .fish-stage::before, .fish-stage::after { content: ""; position: absolute; z-index: 0; bottom: 0; pointer-events: none; }
+    .fish-stage::before { left: 0; width: 12%; height: 30%; background: #176c68; clip-path: polygon(0 100%, 0 40%, 22% 14%, 28% 100%, 47% 46%, 53% 100%, 76% 0, 82% 100%, 100% 55%, 100% 100%); }
+    .fish-stage::after { right: 0; width: 13%; height: 25%; background: #df805d; clip-path: polygon(0 100%, 13% 53%, 24% 100%, 35% 18%, 45% 100%, 63% 46%, 72% 100%, 84% 0, 94% 100%, 100% 58%, 100% 100%); }
+    .fish-photo, .skeleton-art { position: absolute; z-index: 1; inset: 0; width: 100%; height: 100%; }
+    .fish-photo { inset: 6%; width: 88%; height: 88%; object-fit: contain; border: 2px solid #ffffffaa; border-radius: 14px; box-shadow: 0 8px 18px #073a5366; }
+    .skeleton-art { display: none; background: #125b79; }
+    .fish-stage[data-mode="skeleton"] .fish-photo { display: none; }
+    .fish-stage[data-mode="skeleton"] .skeleton-art { display: block; }
+    .skeleton-silhouette { fill: #d8c89b12; stroke: #70cee6; stroke-width: 3; stroke-dasharray: 8 8; }
+    .bone { fill: none; stroke: #fff1bb; stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+    .bone-fine { fill: none; stroke: #e8d9a9; stroke-width: 3; stroke-linecap: round; }
+    .bone-joint { fill: #fff1bb; stroke: #125b79; stroke-width: 2; }
+    .bone.is-placed, .bone-fine.is-placed { stroke: #f39169; }
+    .water-line { fill: none; stroke: #80d8e9; stroke-width: 2; stroke-dasharray: 4 9; opacity: .75; }
+    .drop-zone {
+      position: absolute; z-index: 2; width: clamp(31px, 5.3vw, 45px); aspect-ratio: 1; padding: 0;
+      display: grid; place-items: center; border: 2px dashed #496e60; border-radius: 50%; background: #fff9dfd9;
+      color: #325c4f; cursor: pointer; font-size: 12px; font-weight: 900; transform: translate(-50%, -50%); transition: .2s;
+    }
+    .drop-zone:hover, .drop-zone.is-over { background: var(--sun); border-style: solid; transform: translate(-50%, -50%) scale(1.12); }
+    .drop-zone.is-correct { border: 2px solid #fff8db; background: #4e9b7e; color: white; box-shadow: 0 2px 9px #234d3744; }
+    .drop-zone.is-wrong { animation: nudge .25s linear 2; background: #f0a184; }
+    .zone-skeleton-skull { left: 22%; top: 49%; }
+    .zone-skeleton-spine { left: 51%; top: 51%; }
+    .zone-skeleton-ribs { left: 41%; top: 59%; }
+    .zone-skeleton-dorsal { left: 53%; top: 27%; }
+    .zone-skeleton-pelvic { left: 48%; top: 72%; }
+    .zone-skeleton-tail { left: 85%; top: 51%; }
+    @keyframes nudge { 25% { translate: -4px 0; } 75% { translate: 4px 0; } }
+    .feedback { min-height: 28px; margin: 4px 18px 0; color: #5d776e; font-size: 12px; }
+    .feedback.is-good { color: #317a60; font-weight: 800; }
+    .play-foot { padding: 6px 18px 15px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .species-current { color: #55756a; font-size: 11px; }
+    .reset-button { padding: 7px 10px; border: 1px solid #c7d9cc; border-radius: 4px; background: transparent; font-size: 11px; font-weight: 800; cursor: pointer; }
+    .reset-button:hover { background: #edf4e9; }
+    .parts-panel { padding: 17px 14px 14px; }
+    .parts-heading { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 5px; }
+    .parts-grid { display: grid; gap: 6px; }
+    .part-card {
+      position: relative; width: 100%; min-height: 48px; padding: 7px 8px; display: flex; align-items: center; gap: 9px;
+      border: 1px solid #d8e3d8; border-radius: 4px; background: #fffef7; text-align: left; cursor: grab; touch-action: none;
+      transition: transform .16s, border .16s, background .16s, opacity .2s;
+    }
+    .part-card:hover { transform: translateY(-1px); border-color: #80b69b; }
+    .part-card:active { cursor: grabbing; }
+    .part-card.is-selected { border-color: #e68b64; background: #fff2dc; box-shadow: 0 0 0 2px #f0c86a55; }
+    .part-card.is-used { opacity: .38; cursor: default; }
+    .part-icon { width: 30px; height: 30px; flex: 0 0 30px; display: grid; place-items: center; border-radius: 50%; background: #e5f0e5; color: #477b67; }
+    .part-icon svg { width: 22px; height: 22px; fill: currentColor; }
+    .part-name { font-size: 12px; font-weight: 850; }
+    .part-name-en { display: block; margin-top: 2px; color: #55756a; font-size: 10px; }
+    .part-sub { display: block; margin-top: 2px; color: var(--muted); font-size: 9px; }
+    .fact-list { margin-top: 13px; padding-top: 11px; border-top: 1px solid #d9e4da; }
+    .fact-title { margin: 0 0 7px; color: #5b776c; font-size: 10px; font-weight: 900; letter-spacing: .04em; }
+    .fact { margin: 0; padding: 5px 0; color: #557067; font-size: 10px; line-height: 1.5; border-top: 1px solid #edf0e7; }
+    .fact strong { color: #294e43; }
+    .photo-credit { margin: 0; padding: 0 18px 13px; color: #71857a; font-size: 9px; line-height: 1.5; }
+    .photo-credit a { color: #456f61; }
+    .interaction-hint { margin: 8px 18px 0; color: #55756a; font-size: 10px; line-height: 1.6; }
+    .mode-note { margin: 0 18px 8px; color: #f2d79b; font-size: 10px; }
+    .drag-ghost { position: fixed; z-index: 20; padding: 7px 10px; border: 1px solid #f2d79b; border-radius: 4px; background: #193b36ed; color: white; font-size: 11px; pointer-events: none; transform: translate(-50%, -140%); }
+    .complete-banner { display: none; margin: 14px 12px 12px; padding: 10px 12px; border-radius: 4px; background: #e2f1db; color: #317450; text-align: center; font-size: 13px; font-weight: 900; }
+    .complete-banner.is-visible { display: block; animation: pop .35s ease-out; }
+    @keyframes pop { from { opacity: 0; transform: translateY(6px) scale(.98); } to { opacity: 1; transform: none; } }
+    footer { margin-top: 16px; color: #648077; font-size: 10px; text-align: center; }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 195px minmax(360px, 1fr); }
+      .parts-panel { grid-column: 1 / -1; }
+      .parts-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .fact-list { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 12px; }
+      .fact-title { grid-column: 1 / -1; }
+    }
+    @media (max-width: 650px) {
+      .topbar { min-height: 54px; }
+      .top-note { font-size: 11px; }
+      main { padding-top: 19px; }
+      .intro { display: block; margin-bottom: 15px; }
+      .intro-copy { margin-top: 9px; max-width: 500px; font-size: 12px; }
+      .layout { grid-template-columns: 1fr; gap: 11px; }
+      .species-panel { padding: 12px; }
+      .section-head { margin-bottom: 8px; }
+      .species-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
+      .species-button { display: grid; justify-items: center; gap: 4px; padding: 7px 3px; text-align: center; }
+      .fish-stamp { width: 34px; height: 34px; font-size: 19px; }
+      .species-name { font-size: 11px; }
+      .species-common-en, .species-latin { font-size: 8px; }
+      .classification { display: grid; grid-template-columns: 82px 1fr; align-items: center; gap: 0 8px; margin-top: 10px; padding-top: 9px; }
+      .class-label { grid-row: span 2; }
+      .class-name { margin: 0; font-size: 13px; }
+      .class-path { font-size: 10px; }
+      .play-head { padding: 12px; }
+      .view-switch { order: 3; width: 100%; }
+      .view-button { flex: 1; }
+      .fish-stage { min-height: 0; margin: 0 7px; }
+      .drop-zone { width: clamp(28px, 8vw, 38px); font-size: 10px; }
+      .interaction-hint { margin: 7px 12px 0; font-size: 10px; }
+      .mode-note { margin: 0 12px 7px; }
+      .feedback { margin: 5px 12px 0; min-height: 24px; font-size: 11px; }
+      .play-foot { padding: 4px 12px 12px; }
+      .parts-panel { padding: 13px 10px 11px; }
+      .parts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; }
+      .part-card { min-height: 56px; gap: 6px; padding: 6px; }
+      .part-icon { width: 27px; height: 27px; flex-basis: 27px; }
+      .part-name { font-size: 11px; }
+      .part-name-en { font-size: 9px; }
+      .fact-list { grid-template-columns: 1fr 1fr; }
+      .fact-title { grid-column: 1 / -1; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+
+    :root {
+      --ink: #1a2a3a;
+      --muted: #5b7586;
+      --paper: #fff;
+      --sea: #b3e5fc;
+      --sea-dark: #29b6f6;
+      --coral: #ff7043;
+      --sun: #ffca28;
+      --teal: #26a69a;
+      --green: #8bc34a;
+      --shadow: 4px 6px 0 #1a2a3a;
+      font-family: "Mali", "Leelawadee UI", sans-serif;
+    }
+    body {
+      color: var(--ink);
+      background-color: var(--sea);
+      background-image:
+        radial-gradient(circle at 20% 30%, #ffffff66 10px, transparent 11px),
+        radial-gradient(circle at 80% 60%, #ffffff66 15px, transparent 16px),
+        radial-gradient(circle at 50% 80%, #ffffff4d 8px, transparent 9px);
+      background-size: 100vw 100vh;
+      background-attachment: fixed;
+    }
+    .topbar { min-height: 70px; background: white; border-bottom: 4px solid var(--ink); }
+    .brand { font-size: 20px; }
+    .brand-mark { width: 40px; height: 40px; border-radius: 50%; border: 3px solid var(--ink); background: var(--sea-dark); font-size: 24px; box-shadow: 2px 2px 0 var(--ink); }
+    .top-note { padding: 4px 12px; border: 2px solid var(--ink); border-radius: 20px; background: var(--sun); color: var(--ink); font-size: 13px; font-weight: 700; }
+    .intro { padding: 15px 25px; border: 4px solid var(--ink); border-radius: 16px; background: white; box-shadow: var(--shadow); }
+    .eyebrow { color: var(--coral); font-size: 14px; letter-spacing: 0; }
+    h1 { color: var(--sea-dark); font-family: inherit; font-size: 36px; font-weight: 700; line-height: 1.2; text-shadow: 1px 1px 0 var(--ink); }
+    .intro-copy { max-width: 400px; color: var(--ink); font-size: 15px; font-weight: 600; line-height: 1.5; }
+    .layout { grid-template-columns: 240px minmax(390px, 1fr) 290px; gap: 20px; }
+    .panel { border: 4px solid var(--ink); border-radius: 20px; background: var(--paper); box-shadow: var(--shadow); }
+    .species-panel, .parts-panel { padding: 20px 16px; }
+    .section-head h2, .panel-title { color: var(--teal); font-size: 18px; }
+    .mini-count { padding: 3px 8px; border: 2px solid var(--ink); border-radius: 12px; background: #eee; color: var(--ink); font-size: 12px; font-weight: 700; }
+    .species-list { gap: 12px; }
+    .species-button {
+      padding: 10px; border: 3px solid var(--ink); border-radius: 16px; background: white;
+      box-shadow: 2px 3px 0 var(--ink); transition: transform .1s, box-shadow .1s, background .1s;
+    }
+    .species-button:hover { transform: translateY(-3px); box-shadow: 2px 6px 0 var(--ink); background: #f0f9ff; }
+    .species-button:active { transform: translateY(2px); box-shadow: 0 0 0 var(--ink); }
+    .species-button[aria-pressed="true"] { background: var(--sun); border-color: var(--ink); }
+    .fish-stamp { width: 50px; height: 50px; flex-basis: 50px; border: 3px solid var(--ink); background: white; }
+    .species-name { font-size: 15px; font-weight: 700; }
+    .species-common-en { color: var(--muted); font-size: 11px; font-weight: 600; }
+    .species-latin { color: var(--muted); font-size: 9px; }
+    .classification { margin-top: 20px; padding: 15px; border: 3px dashed var(--muted); border-radius: 12px; background: #f5f5f5; }
+    .class-label { color: var(--coral); font-size: 13px; letter-spacing: 0; }
+    .class-name { font-size: 15px; }
+    .class-path { color: var(--muted); font-size: 11px; line-height: 1.5; }
+    .play-panel { display: flex; flex-direction: column; background: #fdfbf7; }
+    .play-head { padding: 18px 20px 12px; }
+    .play-title { color: var(--ink); font-size: 18px; }
+    .view-switch { padding: 4px; gap: 4px; border: 3px solid var(--ink); border-radius: 12px; background: #e0e0e0; box-shadow: 2px 2px 0 var(--ink); }
+    .view-button { padding: 7px 10px; border: 2px solid transparent; border-radius: 8px; color: var(--muted); font-size: 12px; transition: .2s; }
+    .view-button[aria-pressed="true"] { border: 2px solid var(--ink); background: white; color: var(--ink); }
+    .progress-wrap { padding: 5px 12px; border: 3px solid var(--ink); border-radius: 20px; background: white; box-shadow: 2px 2px 0 var(--ink); }
+    .progress-text { color: var(--ink); font-size: 12px; font-weight: 700; }
+    .progress-track { width: 100px; height: 12px; border: 2px solid var(--ink); background: #e0e0e0; }
+    .progress-fill { background: var(--green); transition: width .4s cubic-bezier(.4, 0, .2, 1); }
+    .fish-stage { margin: 0 16px; border-radius: 16px; background: #81d4fa; box-shadow: inset 0 0 20px #0000001a; }
+    .fish-photo { object-fit: contain; }
+    .skeleton-art { background: #1a2a3a; }
+    .skeleton-silhouette { fill: #ffffff0d; stroke: #4fc3f7; stroke-width: 4; }
+    .bone { stroke: white; stroke-width: 8; }
+    .bone-fine { stroke: #e0e0e0; stroke-width: 4; }
+    .bone-joint { fill: white; stroke: var(--ink); stroke-width: 3; }
+    .bone.is-placed, .bone-fine.is-placed { stroke: var(--sun); }
+    .drop-zone {
+      width: clamp(40px, 6vw, 55px); border: 4px dashed white; background: #ffffff66;
+      color: var(--ink); font-size: 19px; transition: .2s cubic-bezier(.34, 1.56, .64, 1);
+    }
+    .drop-zone:hover, .drop-zone.is-over { border-color: var(--ink); border-style: solid; background: var(--sun); transform: translate(-50%, -50%) scale(1.15); box-shadow: 0 4px 10px #0003; }
+    .drop-zone.is-correct { border: 4px solid var(--ink); background: var(--green); color: white; transform: translate(-50%, -50%) scale(1.08); box-shadow: 2px 3px 0 var(--ink); }
+    .drop-zone.is-wrong { border-style: solid; background: var(--coral); animation: shake .3s linear; }
+    @keyframes shake { 0%, 100% { translate: 0 0; } 25% { translate: -6px 0; } 75% { translate: 6px 0; } }
+    .feedback { min-height: 36px; margin: 10px 20px 0; padding: 8px 15px; border: 2px dashed var(--coral); border-radius: 12px; background: #fff3e0; color: var(--coral); font-size: 14px; font-weight: 700; text-align: center; }
+    .feedback.is-good { border-color: var(--green); background: #e8f5e9; color: #2e7d32; }
+    .play-foot { margin-top: auto; padding: 12px 20px 12px; }
+    .species-current { padding: 4px 12px; border: 2px solid var(--ink); border-radius: 20px; background: #eee; color: var(--ink); font-size: 12px; font-weight: 700; }
+    .reset-button { padding: 9px 14px; border: 3px solid var(--ink); border-radius: 12px; background: var(--coral); color: white; font-size: 13px; font-weight: 700; box-shadow: 2px 3px 0 var(--ink); transition: .1s; }
+    .reset-button:hover { transform: translateY(-2px); box-shadow: 2px 5px 0 var(--ink); }
+    .reset-button:active { transform: translateY(2px); box-shadow: 0 0 0 var(--ink); }
+    .parts-heading { margin-bottom: 12px; }
+    .parts-grid { gap: 10px; }
+    .part-card { min-height: 60px; padding: 9px; gap: 12px; border: 3px solid var(--ink); border-radius: 16px; background: white; box-shadow: 2px 3px 0 var(--ink); transition: transform .15s, box-shadow .15s; }
+    .part-card:hover { transform: translateY(-3px) scale(1.01); box-shadow: 2px 6px 0 var(--ink); }
+    .part-card:active { transform: scale(.97); box-shadow: 0 0 0 var(--ink); }
+    .part-card.is-selected { transform: scale(1.02); background: var(--sun); box-shadow: 3px 4px 0 var(--ink); }
+    .part-card.is-used { border-color: #999; background: #e0e0e0; box-shadow: none; opacity: .5; }
+    .part-icon { width: 40px; height: 40px; flex-basis: 40px; border: 2px solid var(--ink); background: var(--sea); color: var(--ink); }
+    .part-icon svg { width: 24px; height: 24px; }
+    .part-name { color: var(--ink); font-size: 14px; font-weight: 700; }
+    .part-name-en { color: var(--muted); font-size: 11px; font-weight: 600; }
+    .part-sub { color: var(--muted); font-size: 10px; }
+    .fact-list { margin-top: 20px; padding-top: 15px; border-top: 3px dashed var(--coral); }
+    .fact-title { margin-bottom: 10px; padding: 5px; border: 2px solid var(--ink); border-radius: 12px; background: white; color: var(--coral); font-size: 13px; text-align: center; }
+    .fact { margin-bottom: 8px; padding: 9px; border: 2px solid var(--ink); border-radius: 12px; background: white; color: var(--ink); font-size: 12px; line-height: 1.5; box-shadow: 2px 2px 0 var(--ink); }
+    .fact strong { display: block; margin-bottom: 2px; color: var(--sea-dark); font-size: 13px; }
+    .interaction-hint { margin: 10px 20px 0; color: var(--teal); font-size: 13px; font-weight: 700; text-align: center; }
+    .mode-note { margin: 8px 20px 0; padding: 7px 10px; border: 2px dashed var(--ink); border-radius: 10px; background: #fff3e0; color: var(--ink); font-size: 11px; font-weight: 600; }
+    .photo-credit { padding: 0 20px 12px; color: var(--muted); font-size: 10px; }
+    .photo-credit a, footer a { color: #0288d1; font-weight: 700; }
+    .complete-banner { margin: 15px; padding: 14px; border: 4px solid var(--ink); border-radius: 16px; background: var(--green); color: white; font-size: 17px; box-shadow: 4px 4px 0 var(--ink); }
+    .complete-banner.is-visible { animation: bounce-in .5s cubic-bezier(.68, -.55, .26, 1.55); }
+    @keyframes bounce-in { 0% { opacity: 0; transform: scale(.3); } 50% { opacity: 1; transform: scale(1.04); } 70% { transform: scale(.96); } 100% { transform: scale(1); } }
+    footer { margin-top: 20px; padding-bottom: 20px; color: var(--ink); font-size: 11px; font-weight: 600; }
+    @media (hover: hover) {
+      .species-button:hover { transform: translateY(-3px); box-shadow: 2px 6px 0 var(--ink); background: #f0f9ff; }
+      .part-card:hover { transform: translateY(-3px) scale(1.01); box-shadow: 2px 6px 0 var(--ink); }
+    }
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 200px minmax(360px, 1fr); }
+    }
+    @media (max-width: 650px) {
+      .topbar { min-height: 60px; padding: 0 15px; }
+      h1 { font-size: 22px; }
+      .intro { flex-direction: column; align-items: flex-start; padding: 15px; margin-bottom: 15px; }
+      .intro-copy { font-size: 14px; }
+      .layout { grid-template-columns: 1fr; gap: 15px; }
+      .species-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .species-button { flex-direction: column; min-width: 0; text-align: center; gap: 6px; }
+      .species-name { font-size: 13px; }
+      .species-common-en { font-size: 9px; }
+      .species-latin { font-size: 8px; overflow-wrap: anywhere; }
+      .classification { padding: 10px; }
+      .class-path { overflow-wrap: anywhere; }
+      .play-head { flex-direction: column; align-items: stretch; gap: 12px; padding: 14px; }
+      .view-switch { order: -1; display: flex; }
+      .view-button { flex: 1; text-align: center; }
+      .fish-stage { margin: 0 8px; border-radius: 12px; }
+      .drop-zone { width: clamp(36px, 10vw, 46px); }
+      .interaction-hint { margin: 10px 14px 0; font-size: 12px; }
+      .feedback { margin: 8px 14px 0; }
+      .play-foot { padding: 12px 14px; }
+      .species-current { max-width: 60%; line-height: 1.4; }
+      .parts-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .part-card { min-width: 0; min-height: 70px; padding: 7px; gap: 7px; }
+      .part-icon { width: 32px; height: 32px; flex-basis: 32px; }
+      .part-name { font-size: 12px; }
+      .part-name-en { font-size: 9px; overflow-wrap: anywhere; }
+      .part-sub { font-size: 9px; }
+      .fact-list { display: block; }
+      .photo-credit { padding-right: 14px; padding-left: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brand-mark" aria-hidden="true">🐡</span><span>ห้องเรียนใต้ทะเล</span></div>
+    <span class="top-note">ด่านที่ 1 · สิ่งมีชีวิต</span>
+  </header>
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <div><p class="eyebrow">ภารกิจสำรวจโลกใต้น้ำ!</p><h1 id="page-title">มาต่อปลาให้ครบ<br>แล้วรู้จักเพื่อนปลาให้มากขึ้น</h1></div>
+      <p class="intro-copy">เลือกปลาที่ชอบ แล้วลากชิ้นส่วนอวัยวะไปวางให้ถูกที่ หรือแตะเลือกแล้วแตะช่องบนตัวปลา เพื่อค้นพบความลับของพวกเขา</p>
+    </section>
+    <div class="layout">
+      <aside class="panel species-panel" aria-label="เลือกชนิดปลา">
+        <div class="section-head"><h2>1. เลือกเพื่อนปลา</h2><span class="mini-count">4 ชนิด</span></div>
+        <div class="species-list" id="species-list"></div>
+        <div class="classification" aria-live="polite">
+          <div class="class-label">แฟ้มประวัติ</div>
+          <div class="class-name" id="class-name"></div>
+          <div class="class-path" id="class-path"></div>
+        </div>
+      </aside>
+      <section class="panel play-panel" aria-label="กระดานต่อชิ้นส่วนปลา">
+        <div class="play-head">
+          <h2 class="play-title" id="play-title">ภาพปลาจริง</h2>
+          <div class="progress-wrap"><span class="progress-text" id="progress-text">0 / 6 ชิ้น</span><span class="progress-track"><span class="progress-fill" id="progress-fill"></span></span></div>
+          <div class="view-switch" role="group" aria-label="โหมดการศึกษา">
+            <button class="view-button" type="button" data-mode="external" aria-pressed="true">ภายนอก</button>
+            <button class="view-button" type="button" data-mode="skeleton" aria-pressed="false">โครงกระดูก</button>
+          </div>
+        </div>
+        <div class="fish-stage" id="fish-stage">
+          <img class="fish-photo" id="fish-photo" alt="ภาพถ่ายปลา">
+          <svg class="skeleton-art" id="skeleton-art" viewBox="0 0 900 600" role="img" aria-label="แผนภาพจำลองโครงกระดูกปลากระดูกแข็ง">
+            <path class="skeleton-silhouette" d="M112 301Q175 176 376 177Q585 178 727 281L811 221Q788 298 811 372L727 320Q583 423 376 424Q175 424 112 301Z"/>
+            <g data-bone="skull" class="bone"><path d="M141 292Q164 239 223 241L274 271 264 314 218 347 163 334Z"/><path d="M147 293 111 301 152 311M219 243 226 223M230 342 244 361"/><circle class="bone-joint" cx="203" cy="283" r="13"/></g>
+            <g data-bone="spine" class="bone"><path d="M259 299Q390 290 525 301T716 300"/>
+              <path class="bone-fine" d="M278 287v27m22-29v29m22-30v30m22-30v30m22-30v30m22-30v30m22-30v30m22-30v30m22-30v30m22-29v29m22-28v28m22-27v27m22-26v26m22-24v24m22-22v22m22-20v20"/>
+            </g>
+            <g data-bone="ribs" class="bone-fine">
+              <path d="M302 306Q290 340 320 377M329 305Q316 348 348 390M356 304Q344 352 378 397M383 304Q371 355 407 399M410 304Q399 354 435 395M437 304Q426 350 462 389M464 304Q454 343 489 378"/>
+            </g>
+            <g data-bone="dorsal" class="bone-fine"><path d="M295 292 278 235m35 56-3-67m34 66 10-76m25 74 20-72m16 70 28-67m10 66 34-60m-3 59 38-51m-9 51 39-43m-11 44 38-34"/></g>
+            <g data-bone="pelvic" class="bone"><path d="M413 365Q455 407 503 371M455 394l-21 53m22-50 22 52"/><path class="bone-fine" d="M434 447 398 474m57-27-4 31m27-32 29 25"/></g>
+            <g data-bone="tail" class="bone"><path d="M698 300Q754 295 805 227M698 302Q753 308 805 372"/><path class="bone-fine" d="m718 300 66-57m-40 59 59-31m-57 33 56-5m-77 0 59 31m-40-28 58 53"/></g>
+            <path class="water-line" d="M70 510Q180 493 290 510T510 510T730 510T870 510"/>
+          </svg>
+          <div id="drop-zones"></div>
+        </div>
+        <p class="mode-note" id="mode-note" hidden>แผนภาพจำลองเพื่อเรียนรู้ตำแหน่งกระดูก ไม่ใช่ภาพผลการทดลอง clearing and staining</p>
+        <p class="interaction-hint" id="interaction-hint">👆 แตะชิ้นส่วนด้านขวา แล้วแตะในวงกลมบนตัวปลาได้เลย!</p>
+        <p class="feedback" id="feedback" aria-live="polite">พร้อมแล้ว! เลือกชิ้นส่วนเพื่อเริ่มต่อปลาเลยจ้า</p>
+        <div class="play-foot"><span class="species-current" id="species-current"></span><button class="reset-button" id="reset-button" type="button">🔄 เริ่มใหม่</button></div>
+        <p class="photo-credit" id="photo-credit"></p>
+        <div class="complete-banner" id="complete-banner" role="status">🎉 เก่งมาก! ประกอบร่างเสร็จแล้ว ลองปลาตัวอื่นดูไหม?</div>
+      </section>
+      <aside class="panel parts-panel" aria-label="ชิ้นส่วนและข้อมูลปลา">
+        <div class="parts-heading"><h2 class="panel-title" id="parts-panel-title">2. กล่องชิ้นส่วน</h2><span class="mini-count" id="parts-hint">แตะ / ลาก</span></div>
+        <div class="parts-grid" id="parts-grid"></div>
+        <div class="fact-list" id="fact-list" aria-live="polite"></div>
+      </aside>
+    </div>
+    <footer>ข้อมูลและภาพถ่ายเพื่อการศึกษา · ภาพจาก Wikimedia Commons ตามสัญญาอนุญาตของแต่ละภาพ</footer>
+  </main>
+  <script>
+    const species = [
+      { id: "betta", name: "ปลากัด", commonEn: "Siamese fighting fish", latin: "Betta splendens", group: "ปลากัด · Siamese fighting fish", path: "Actinopterygii › Anabantiformes › Osphronemidae", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Betta_splendens_male_with_bubble_nest.jpg/960px-Betta_splendens_male_with_bubble_nest.jpg", imageAlt: "ปลากัดตัวผู้ว่ายอยู่ใต้น้ำใต้หวอดฟองอากาศ", width: 2272, height: 1704, imagePage: "https://commons.wikimedia.org/wiki/File:Betta_splendens_male_with_bubble_nest.jpg", author: "ErgoSum88", license: "Public domain", licensePage: "https://commons.wikimedia.org/wiki/Commons:Public_domain", zones: { eye: [37, 30], gill: [44, 34], dorsal: [60, 17], pectoral: [45, 43], pelvic: [52, 68], tail: [76, 57] }, learning: { dorsal: "ครีบหลังช่วยทรงตัวและต้านการเอียง ภาพนี้เป็นปลากัดครีบสั้นแบบปลากัดหม้อ", pectoral: "ครีบอกเล็กช่วยบังคับทิศและเบรก การโบกครีบอกเป็นจังหวะยังใช้สื่อสาร", pelvic: "ครีบท้องคู่ช่วยทรงตัวและเปลี่ยนทิศ ปลากัดมีครีบท้องยื่นยาวเป็นลักษณะเด่น", tail: "ครีบหางสร้างแรงส่ง ปลากัดครีบสั้นเคลื่อนที่คล่องกว่าปลากัดครีบยาวประดับ", gill: "เหงือกแลกเปลี่ยนก๊าซในน้ำ และปลากัดยังมีอวัยวะเขาวงกตช่วยฮุบอากาศเหนือผิวน้ำ", eye: "ตาหันด้านข้างช่วยตรวจจับอาหารและการเคลื่อนไหวใกล้ตัว" } },
+      { id: "arowana", name: "ปลามังกรเอเชีย", commonEn: "Asian arowana", latin: "Scleropages formosus", group: "ปลามังกรเอเชีย · Asian arowana", path: "Actinopterygii › Osteoglossiformes › Osteoglossidae", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/London_Aquarium_%28539698092%29.jpg/960px-London_Aquarium_%28539698092%29.jpg", imageAlt: "ปลามังกรเอเชียว่ายอยู่ในตู้ไม้น้ำ", width: 3456, height: 2304, imagePage: "https://commons.wikimedia.org/wiki/File:London_Aquarium_(539698092).jpg", author: "Phalinn Ooi", license: "CC BY 2.0", licensePage: "https://creativecommons.org/licenses/by/2.0/", zones: { eye: [13, 47], gill: [22, 49], dorsal: [58, 34], pectoral: [35, 62], pelvic: [51, 69], tail: [94, 50] }, learning: { dorsal: "ครีบหลังที่วางค่อนไปทางท้ายลำตัวทำงานร่วมกับครีบก้น ช่วยทรงตัวขณะลอยหาเหยื่อ", pectoral: "ครีบอกคู่ช่วยเลี้ยวและประคองการว่ายในชั้นน้ำใกล้ผิวน้ำ", pelvic: "ครีบท้องขนาดเล็กช่วยรักษาสมดุล ไม่ได้สร้างแรงขับหลัก", tail: "ลำตัวและครีบหางมีกล้ามเนื้อช่วยพุ่งจับเหยื่อที่ผิวน้ำ", gill: "เหงือกดึงออกซิเจนจากน้ำ ส่วนเกล็ดใหญ่ช่วยปกป้องลำตัว", eye: "ตาและปากที่เชิดขึ้นเหมาะกับการมองหาเหยื่อเหนือหรือใกล้ผิวน้ำ" } },
+      { id: "gourami", name: "ปลาแรด", commonEn: "Giant gourami", latin: "Osphronemus goramy", group: "ปลาแรด · Giant gourami", path: "Actinopterygii › Anabantiformes › Osphronemidae", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/0/06/Osphronemus_goramy_2008_G1.jpg/960px-Osphronemus_goramy_2008_G1.jpg", imageAlt: "ปลาแรดโตเต็มวัยลำตัวสีเทาเงิน", width: 2100, height: 1430, imagePage: "https://commons.wikimedia.org/wiki/File:Osphronemus_goramy_2008_G1.jpg", author: "George Chernilevsky", license: "Public domain", licensePage: "https://commons.wikimedia.org/wiki/Commons:Public_domain", zones: { eye: [18, 37], gill: [27, 43], dorsal: [59, 17], pectoral: [36, 45], pelvic: [58, 68], tail: [81, 46] }, learning: { dorsal: "ครีบหลังยาวช่วยพยุงลำตัว ปลาแรดโตเต็มวัยอาจมีส่วนหน้าผากนูนเด่น", pectoral: "ครีบอกช่วยควบคุมการเลี้ยวและหยุดในแหล่งน้ำนิ่ง", pelvic: "ครีบท้องของปลากลุ่มกระดี่และปลาแรดมีเส้นครีบที่ใช้รับสัมผัสในน้ำ", tail: "ครีบหางช่วยผลักลำตัวขนาดใหญ่ให้เคลื่อนที่", gill: "เหงือกใช้หายใจในน้ำ และปลาแรดมีอวัยวะเขาวงกตช่วยใช้อากาศที่ผิวน้ำ", eye: "ดวงตาด้านข้างช่วยมองหาอาหารและรับรู้สิ่งรอบตัวในแหล่งน้ำจืด" } },
+      { id: "tilapia", name: "ปลานิล", commonEn: "Nile tilapia", latin: "Oreochromis niloticus", group: "ปลานิล · Nile tilapia", path: "Actinopterygii › Cichliformes › Cichlidae", image: "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Tilapia_del_Nilo_%28Oreochromis_niloticus%29%2C_cenote_El_Pit%2C_Yucat%C3%A1n%2C_M%C3%A9xico%2C_2025-12-23%2C_DD_02.jpg/960px-Tilapia_del_Nilo_%28Oreochromis_niloticus%29%2C_cenote_El_Pit%2C_Yucat%C3%A1n%2C_M%C3%A9xico%2C_2025-12-23%2C_DD_02.jpg", imageAlt: "ปลานิลว่ายอยู่ในถ้ำใต้น้ำ", width: 2720, height: 1813, imagePage: "https://commons.wikimedia.org/wiki/File:Tilapia_del_Nilo_(Oreochromis_niloticus),_cenote_El_Pit,_Yucat%C3%A1n,_M%C3%A9xico,_2025-12-23,_DD_02.jpg", author: "Diego Delso (delso.photo)", license: "CC BY-SA 4.0", licensePage: "https://creativecommons.org/licenses/by-sa/4.0/", zones: { eye: [67, 27], gill: [64, 30], dorsal: [45, 20], pectoral: [62, 35], pelvic: [50, 45], tail: [25, 35] }, learning: { dorsal: "ครีบหลังยาวมีทั้งก้านครีบแข็งและอ่อน ช่วยทรงตัวและป้องกันตัว", pectoral: "ครีบอกช่วยเลี้ยวและชะลอความเร็วในบ่อหรือแหล่งน้ำจืด", pelvic: "ครีบท้องคู่ช่วยรักษาสมดุลขณะหาอาหารใกล้พื้น", tail: "ลายแถบบนครีบหางเป็นลักษณะช่วยสังเกตปลานิลตามธรรมชาติ", gill: "เหงือกกรองออกซิเจนจากน้ำ ปลานิลกินอาหารได้หลากหลายจึงเลี้ยงในบ่อได้ดี", eye: "ปลานิลตัวเมียอมไข่และลูกปลาไว้ในปากเพื่อป้องกันอันตราย" } }
+    ];
+    const parts = [
+      { id: "dorsal", name: "ครีบหลัง", english: "Dorsal fin", hint: "พยุงการทรงตัว", shape: "<path d='M4 20 13 4l5 16z'/>" },
+      { id: "pectoral", name: "ครีบอก", english: "Pectoral fin", hint: "บังคับทิศทาง", shape: "<path d='M3 9Q12 2 21 9L12 22z'/>" },
+      { id: "pelvic", name: "ครีบท้อง", english: "Pelvic fin", hint: "ช่วยทรงตัว", shape: "<path d='M4 5 12 20 20 5z'/>" },
+      { id: "tail", name: "ครีบหาง", english: "Caudal fin", hint: "สร้างแรงขับ", shape: "<path d='M4 3 13 12 4 21 21 12z'/>" },
+      { id: "gill", name: "เหงือก", english: "Gills", hint: "รับออกซิเจนในน้ำ", shape: "<path d='M7 3Q2 12 7 21M13 3Q8 12 13 21M19 3Q14 12 19 21' fill='none' stroke='currentColor' stroke-width='2'/>" },
+      { id: "eye", name: "ดวงตา", english: "Eye", hint: "รับแสงและภาพ", shape: "<circle cx='12' cy='12' r='8'/><circle cx='12' cy='12' r='3' fill='#f8f8ee'/>" }
+    ];
+    const skeletonParts = [
+      { id: "skull", name: "กะโหลก", english: "Skull", hint: "ปกป้องสมองและรองรับขากรรไกร", fact: "กะโหลกประกอบด้วยกระดูกหลายชิ้น รองรับสมอง ตา และขากรรไกร; รูปร่างขากรรไกรสัมพันธ์กับวิธีหาอาหาร", position: [22, 49], shape: "<path d='M4 8h12v9H4z'/><circle cx='8' cy='12' r='2'/>" },
+      { id: "spine", name: "กระดูกสันหลัง", english: "Vertebral column", hint: "พยุงลำตัวและเป็นแกนให้กล้ามเนื้อ", fact: "กระดูกสันหลังเรียงเป็นข้อยืดหยุ่น กล้ามเนื้อสองข้างดึงสลับกันเพื่อโบกตัวว่ายน้ำ", position: [51, 51], shape: "<path d='M3 5h4v14H3zm7 0h4v14h-4zm7 0h4v14h-4z'/>" },
+      { id: "ribs", name: "ซี่โครง", english: "Ribs", hint: "โค้งจากแนวสันหลังล้อมปกป้องอวัยวะ", fact: "ซี่โครงยึดกับกระดูกสันหลังและช่วยพยุงผนังลำตัว รอบอวัยวะภายในโดยไม่ทำให้ลำตัวแข็งทื่อ", position: [41, 59], shape: "<path d='M5 4Q1 12 5 20M11 4Q7 12 11 20M17 4Q13 12 17 20' fill='none' stroke='currentColor' stroke-width='2'/>" },
+      { id: "dorsal", name: "ก้านครีบหลัง", english: "Dorsal fin rays", hint: "ก้านครีบช่วยค้ำและกางครีบ", fact: "ก้านครีบพยุงเยื่อครีบ; บางชนิดมีก้านแข็งด้านหน้าช่วยค้ำครีบและลดโอกาสถูกงับ", position: [53, 27], shape: "<path d='M4 20 8 4m4 16V3m4 17-1-16m5 16-3-13' fill='none' stroke='currentColor' stroke-width='2'/>" },
+      { id: "pelvic", name: "โครงครีบท้อง", english: "Pelvic girdle", hint: "ยึดครีบท้องกับโครงลำตัว", fact: "โครงครีบท้องเป็นจุดยึดครีบคู่ด้านล่าง ซึ่งช่วยควบคุมการทรงตัวและการเลี้ยว", position: [48, 72], shape: "<path d='M4 6q8 9 16 0M12 12v9M12 17 6 21m6-4 6 4' fill='none' stroke='currentColor' stroke-width='2'/>" },
+      { id: "tail", name: "โครงครีบหาง", english: "Caudal skeleton", hint: "ส่งแรงจากกระดูกสันหลังสู่ครีบหาง", fact: "กระดูกปลายสันหลังและก้านครีบหางรับแรงจากกล้ามเนื้อลำตัว แล้วถ่ายทอดเป็นแรงผลักน้ำ", position: [85, 51], shape: "<path d='M3 12h8m0 0 9-8m-9 8 9 8m-9-8 7-2m-7 2 7 2' fill='none' stroke='currentColor' stroke-width='2'/>" }
+    ];
+    const state = { selectedSpecies: species[0].id, mode: "external", placed: new Set(), selectedPart: null, suppressNextClick: false, touchDrag: null };
+    const speciesList = document.querySelector("#species-list");
+    const partsGrid = document.querySelector("#parts-grid");
+    const dropZones = document.querySelector("#drop-zones");
+    const feedback = document.querySelector("#feedback");
+
+    function currentFish() { return species.find(fish => fish.id === state.selectedSpecies); }
+    function activeParts() { return state.mode === "skeleton" ? skeletonParts : parts; }
+    function renderSpecies() {
+      speciesList.innerHTML = species.map(fish => `
+        <button class="species-button" type="button" data-species="${fish.id}" aria-pressed="${fish.id === state.selectedSpecies}">
+          <span class="fish-stamp" aria-hidden="true"><img class="fish-thumb" src="${fish.image}" alt=""></span><span><span class="species-name">${fish.name}</span><span class="species-common-en">${fish.commonEn}</span><span class="species-latin">${fish.latin}</span></span>
+        </button>`).join("");
+      const fish = currentFish();
+      document.querySelector("#class-name").textContent = fish.group;
+      document.querySelector("#class-path").textContent = fish.path;
+      document.querySelector("#species-current").textContent = `กำลังสำรวจ: ${fish.name} · ${fish.commonEn}`;
+      document.querySelector("#photo-credit").innerHTML = `ภาพ: <a href="${fish.imagePage}" target="_blank" rel="noreferrer">${fish.author} / Wikimedia Commons</a> · <a href="${fish.licensePage}" target="_blank" rel="noreferrer">${fish.license}</a>`;
+    }
+    function renderFish() {
+      const fish = currentFish();
+      const image = document.querySelector("#fish-photo");
+      image.src = fish.image;
+      image.alt = fish.imageAlt;
+      const stage = document.querySelector("#fish-stage");
+      stage.dataset.species = fish.id;
+      stage.dataset.mode = state.mode;
+      stage.style.aspectRatio = state.mode === "skeleton" ? "3 / 2" : `${fish.width} / ${fish.height}`;
+      document.querySelector("#skeleton-art").querySelectorAll("[data-bone]").forEach(bone => {
+        bone.classList.toggle("is-placed", state.mode === "skeleton" && state.placed.has(bone.dataset.bone));
+      });
+      document.querySelector("#mode-note").hidden = state.mode !== "skeleton";
+      document.querySelector("#play-title").textContent = state.mode === "skeleton" ? "โครงกระดูกปลา 🦴" : "ภาพตัวปลาจริง ๆ 🐟";
+      document.querySelectorAll(".view-button").forEach(button => {
+        button.setAttribute("aria-pressed", String(button.dataset.mode === state.mode));
+      });
+      document.querySelector("#parts-panel-title").textContent = state.mode === "skeleton" ? "ชิ้นส่วนโครงกระดูก" : "ชิ้นส่วนร่างกาย";
+      renderZones();
+    }
+    function renderZones() {
+      const fish = currentFish();
+      dropZones.innerHTML = activeParts().map(part => {
+        const [left, top] = state.mode === "skeleton" ? part.position : fish.zones[part.id];
+        const photoInset = state.mode === "external" ? 6 : 0;
+        const photoScale = state.mode === "external" ? 0.88 : 1;
+        const zoneLeft = photoInset + left * photoScale;
+        const zoneTop = photoInset + top * photoScale;
+        const className = state.mode === "skeleton" ? `zone-skeleton-${part.id}` : `zone-${part.id}`;
+        const placed = state.placed.has(part.id);
+        return `<button class="drop-zone ${className} ${placed ? "is-correct" : ""}" style="left:${zoneLeft}%;top:${zoneTop}%" type="button" data-zone="${part.id}" aria-label="${part.name} ${part.english}" ${placed ? "disabled" : ""}>${placed ? "🌟" : "?"}</button>`;
+      }).join("");
+    }
+    function renderParts() {
+      const currentParts = activeParts();
+      partsGrid.innerHTML = currentParts.map(part => `
+        <button type="button" class="part-card ${state.placed.has(part.id) ? "is-used" : ""} ${state.selectedPart === part.id ? "is-selected" : ""}" data-part="${part.id}" draggable="true" aria-pressed="${state.selectedPart === part.id}" ${state.placed.has(part.id) ? "disabled" : ""}>
+          <span class="part-icon" aria-hidden="true"><svg viewBox="0 0 24 24">${part.shape}</svg></span><span><span class="part-name">${part.name}</span><span class="part-name-en">${part.english}</span><span class="part-sub">${part.hint}</span></span>
+        </button>`).join("");
+      document.querySelector("#parts-hint").textContent = state.mode === "skeleton" ? "ภาพจำลอง" : "แตะ / ลาก";
+      document.querySelector("#fact-list").innerHTML = `<p class="fact-title">💡 เกร็ดความรู้</p>` + currentParts.filter(part => state.placed.has(part.id)).map(part => {
+        const note = state.mode === "skeleton" ? part.fact : currentFish().learning[part.id];
+        return `<p class="fact"><strong>${part.name} · ${part.english}</strong>${note}</p>`;
+      }).join("");
+      document.querySelector("#progress-text").textContent = `ต่อแล้ว ${state.placed.size} / ${currentParts.length} ชิ้น`;
+      document.querySelector("#progress-fill").style.width = `${state.placed.size / currentParts.length * 100}%`;
+      renderZones();
+      document.querySelector("#complete-banner").classList.toggle("is-visible", state.placed.size === currentParts.length);
+    }
+    function setFeedback(message, isGood = false) {
+      feedback.textContent = message;
+      feedback.classList.toggle("is-good", isGood);
+    }
+    function placePart(zoneId, partId) {
+      if (!partId || state.placed.has(zoneId)) return;
+      const zone = document.querySelector(`#drop-zones [data-zone="${zoneId}"]`);
+      if (!zone) return;
+      if (zoneId !== partId) {
+        zone.classList.remove("is-wrong");
+        void zone.offsetWidth;
+        zone.classList.add("is-wrong");
+        setFeedback("อ๊ะ! ชิ้นนี้ยังไม่ถูกที่ ลองดูช่องอื่นใหม่นะ 😅");
+        return;
+      }
+      state.placed.add(partId);
+      state.selectedPart = null;
+      const part = activeParts().find(item => item.id === partId);
+      setFeedback(`ยอดเยี่ยม! ใส่ ${part.name} ถูกต้องแล้ว 🌟`, true);
+      renderFish();
+      renderParts();
+    }
+    function resetGame() {
+      state.placed.clear();
+      state.selectedPart = null;
+      setFeedback("พร้อมแล้ว! เลือกชิ้นส่วนเพื่อเริ่มต่อปลาเลยจ้า");
+      renderFish();
+      renderParts();
+    }
+    speciesList.addEventListener("click", event => {
+      const button = event.target.closest("[data-species]");
+      if (!button) return;
+      state.selectedSpecies = button.dataset.species;
+      resetGame();
+      renderSpecies();
+    });
+    partsGrid.addEventListener("click", event => {
+      if (state.suppressNextClick) {
+        state.suppressNextClick = false;
+        return;
+      }
+      const card = event.target.closest("[data-part]");
+      if (!card || card.disabled) return;
+      state.selectedPart = state.selectedPart === card.dataset.part ? null : card.dataset.part;
+      const part = activeParts().find(item => item.id === state.selectedPart);
+      setFeedback(part ? `เลือกแล้ว: ${part.name} · ${part.english}` : "เลือกชิ้นส่วนเพื่อเริ่มประกอบ");
+      renderParts();
+    });
+    partsGrid.addEventListener("pointerdown", event => {
+      if (event.pointerType === "mouse") return;
+      const card = event.target.closest("[data-part]");
+      if (!card || card.disabled) return;
+      event.preventDefault();
+      state.selectedPart = card.dataset.part;
+      state.touchDrag = { pointerId: event.pointerId, partId: card.dataset.part, startX: event.clientX, startY: event.clientY, dragging: false };
+      card.classList.add("is-selected");
+      card.setAttribute("aria-pressed", "true");
+      const part = activeParts().find(item => item.id === card.dataset.part);
+      setFeedback(`เลือกแล้ว: ${part.name} · ${part.english}`);
+    });
+    document.addEventListener("pointermove", event => {
+      const drag = state.touchDrag;
+      if (!drag || event.pointerId !== drag.pointerId) return;
+      if (!drag.dragging && Math.hypot(event.clientX - drag.startX, event.clientY - drag.startY) > 8) {
+        drag.dragging = true;
+        const part = activeParts().find(item => item.id === drag.partId);
+        const ghost = document.createElement("span");
+        ghost.className = "drag-ghost";
+        ghost.id = "drag-ghost";
+        ghost.textContent = `${part.name} · ${part.english}`;
+        document.body.append(ghost);
+      }
+      const ghost = document.querySelector("#drag-ghost");
+      if (ghost) {
+        ghost.style.left = `${event.clientX}px`;
+        ghost.style.top = `${event.clientY}px`;
+      }
+      const target = document.elementFromPoint(event.clientX, event.clientY)?.closest("[data-zone]");
+      dropZones.querySelectorAll(".drop-zone").forEach(zone => zone.classList.toggle("is-over", zone === target));
+    });
+    function finishTouchDrag(event, allowDrop) {
+      const drag = state.touchDrag;
+      if (!drag || event.pointerId !== drag.pointerId) return;
+      if (allowDrop && drag.dragging) {
+        const target = document.elementFromPoint(event.clientX, event.clientY)?.closest("[data-zone]");
+        if (target) placePart(target.dataset.zone, drag.partId);
+      }
+      document.querySelector("#drag-ghost")?.remove();
+      dropZones.querySelectorAll(".is-over").forEach(zone => zone.classList.remove("is-over"));
+      state.touchDrag = null;
+      state.suppressNextClick = true;
+      setTimeout(() => { state.suppressNextClick = false; }, 0);
+    }
+    document.addEventListener("pointerup", event => finishTouchDrag(event, true));
+    document.addEventListener("pointercancel", event => finishTouchDrag(event, false));
+    partsGrid.addEventListener("dragstart", event => {
+      const card = event.target.closest("[data-part]");
+      if (!card || card.disabled) return;
+      state.selectedPart = card.dataset.part;
+      event.dataTransfer.setData("text/plain", card.dataset.part);
+      event.dataTransfer.effectAllowed = "move";
+    });
+    dropZones.addEventListener("click", event => {
+      const zone = event.target.closest("[data-zone]");
+      if (zone) placePart(zone.dataset.zone, state.selectedPart);
+    });
+    dropZones.addEventListener("dragover", event => {
+      const zone = event.target.closest("[data-zone]");
+      if (!zone) return;
+      event.preventDefault();
+      zone.classList.add("is-over");
+    });
+    dropZones.addEventListener("dragleave", event => event.target.closest("[data-zone]")?.classList.remove("is-over"));
+    dropZones.addEventListener("drop", event => {
+      const zone = event.target.closest("[data-zone]");
+      if (!zone) return;
+      event.preventDefault();
+      zone.classList.remove("is-over");
+      placePart(zone.dataset.zone, event.dataTransfer.getData("text/plain") || state.selectedPart);
+    });
+    document.querySelectorAll(".view-button").forEach(button => {
+      button.addEventListener("click", () => {
+        state.mode = button.dataset.mode;
+        state.placed.clear();
+        state.selectedPart = null;
+        setFeedback(state.mode === "skeleton" ? "มาลองต่อกระดูกปลากันดูบ้าง!" : "พร้อมแล้ว! เลือกชิ้นส่วนเพื่อเริ่มต่อปลาเลยจ้า");
+        renderFish();
+        renderParts();
+      });
+    });
+    document.querySelector("#reset-button").addEventListener("click", resetGame);
+    renderSpecies();
+    renderFish();
+    renderParts();
+  </script>
+</body>
+</html>
